@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Linguist</string>
+    <string-array name="langs">
+        <item>ENG</item>
+        <item>PL</item>
+        <item>GER</item>
+        <item>FR</item>
+    </string-array>
 </resources>

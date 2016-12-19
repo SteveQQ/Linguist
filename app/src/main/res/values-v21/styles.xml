@@ -5,6 +5,7 @@
         <!-- Customize your theme here. -->
         <item name="android:colorPrimaryDark">@color/material_brown_900</item>
         <item name="android:windowBackground">@color/material_brown_500</item>
+        <item name="android:colorAccent">@color/material_green_600</item>
     </style>
 
 </resources>
