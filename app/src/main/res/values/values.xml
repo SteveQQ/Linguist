@@ -2,4 +2,5 @@
 <resources>
     <color name="material_brown_900">#3e2723</color>
     <color name="material_green_600">#43a047</color>
+    <color name="maetiral_grey_600">#616161</color>
 </resources>

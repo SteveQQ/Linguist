@@ -5,6 +5,10 @@ public class TranslateOutput {
     private String mOutput;
     private String mOutputLanguage;
 
+    public TranslateOutput(){
+        new TranslateOutput("ENG");
+    }
+
     public TranslateOutput(String outputLanguage) {
         mOutputLanguage = outputLanguage;
     }

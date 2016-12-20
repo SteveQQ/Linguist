@@ -1,11 +1,11 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Material.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:colorPrimaryDark">@color/material_brown_900</item>
         <item name="android:windowBackground">@color/material_brown_500</item>
-        <item name="android:colorAccent">@color/material_green_600</item>
+        <item name="colorAccent">@color/maetiral_grey_600</item>
     </style>
 
 </resources>

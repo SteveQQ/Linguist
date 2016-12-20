@@ -17,11 +17,22 @@ import java.util.List;
 public class TranslatesAdapter extends RecyclerView.Adapter<TranslatesAdapter.ViewHolder> {
 
     private ArrayList<TranslateOutput> mOutputOptions;
-    List<String> languageOptions;
+    private List<String> languageOptions;
 
     public TranslatesAdapter() {
         mOutputOptions = new ArrayList<>();
-        mOutputOptions.add(new TranslateOutput("ENG"));
+        mOutputOptions.add(new TranslateOutput());
+    }
+
+    public ArrayList<TranslateOutput> getOutputOptions() {
+        return mOutputOptions;
+    }
+
+    public void setOutputOptions(ArrayList<TranslateOutput> outputOptions) {
+        mOutputOptions = outputOptions;
+    }
+    public void addOutputOption(TranslateOutput option){
+        mOutputOptions.add(option);
     }
 
     @Override
