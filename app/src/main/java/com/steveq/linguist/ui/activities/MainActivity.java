@@ -3,7 +3,6 @@ package com.steveq.linguist.ui.activities;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,6 +15,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.steveq.linguist.R;
 import com.steveq.linguist.adapters.TranslatesAdapter;
 import com.steveq.linguist.model.TranslateOutput;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private EditText mInputWordEditText;
     private Spinner mInputLanguageSpinner;
+    private FloatingActionMenu mActionMenu;
     private FloatingActionButton mAddFloatingActionButton;
     private FloatingActionButton mExecuteFloatingActionButton;
     private CardView mTranslateCardView;
@@ -40,22 +42,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void creatFAB() {
+        mActionMenu = (FloatingActionMenu) findViewById(R.id.floatingActionMenu);
         mAddFloatingActionButton = (FloatingActionButton) findViewById(R.id.addTranslateFab);
         mExecuteFloatingActionButton = (FloatingActionButton) findViewById(R.id.executeTranslateFab);
-
-        mAddFloatingActionButton.setVisibility(View.INVISIBLE);
-        mExecuteFloatingActionButton.setVisibility(View.INVISIBLE);
-
-        animateFab();
-
-        mAddFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "FAB clicked", Toast.LENGTH_LONG).show();
-                mAdapter.addOutputOption(new TranslateOutput());
-                mAdapter.notifyDataSetChanged();
-            }
-        });
+//
+//        mAddFloatingActionButton.setVisibility(View.INVISIBLE);
+//        mExecuteFloatingActionButton.setVisibility(View.INVISIBLE);
+//
+//        animateFab();
+//
+//        mAddFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(MainActivity.this, "FAB clicked", Toast.LENGTH_LONG).show();
+//                mAdapter.addOutputOption(new TranslateOutput());
+//                mAdapter.notifyDataSetChanged();
+//            }
+//        });
     }
 
     private void animateFab() {

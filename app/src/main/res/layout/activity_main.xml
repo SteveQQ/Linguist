@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/coordLayout"
     android:layout_width="match_parent"
@@ -66,30 +67,42 @@
             android:scrollbars="vertical"/>
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:orientation="vertical">
 
-        <android.support.design.widget.FloatingActionButton
+
+        <com.github.clans.fab.FloatingActionMenu
+            android:id="@+id/floatingActionMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="12dp"
+            android:layout_marginRight="12dp"
+            fab:menu_animationDelayPerItem="55"
+            fab:menu_backgroundColor="@android:color/transparent"
+            fab:menu_buttonSpacing="0dp"
+            fab:menu_fab_label="Options"
+            fab:menu_fab_size="normal"
+            fab:menu_icon="@drawable/plus_math"
+            fab:menu_openDirection="up"
+
+            >
+        <com.github.clans.fab.FloatingActionButton
             android:id="@+id/executeTranslateFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow_100"
-            android:layout_marginBottom="16dp"
-            android:layout_gravity="right"
-            app:fabSize="normal"/>
+            fab:fab_label="translate"
+            app:fabSize="mini"/>
 
-        <android.support.design.widget.FloatingActionButton
+        <com.github.clans.fab.FloatingActionButton
             android:id="@+id/addTranslateFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/plus_math"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="16dp"
-            app:fabSize="normal"/>
-    </LinearLayout>
+            fab:fab_label="add"
+            app:fabSize="mini"/>
+        </com.github.clans.fab.FloatingActionMenu>
+
+
 
 
 
