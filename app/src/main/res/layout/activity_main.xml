@@ -76,7 +76,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow_100"
-            android:layout_marginLeft="16dp"
             android:layout_marginBottom="16dp"
             android:layout_gravity="right"
             app:fabSize="normal"/>
@@ -86,7 +85,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/plus_math"
-            android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginBottom="16dp"
             app:fabSize="normal"/>
