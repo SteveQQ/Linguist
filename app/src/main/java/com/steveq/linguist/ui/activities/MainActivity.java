@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private Spinner mInputLanguageSpinner;
     private FloatingActionButton mAddFloatingActionButton;
     private FloatingActionButton mExecuteFloatingActionButton;
+    private CardView mTranslateCardView;
     private TranslatesAdapter mAdapter;
 
     @Override
@@ -40,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     private void creatFAB() {
         mAddFloatingActionButton = (FloatingActionButton) findViewById(R.id.addTranslateFab);
         mExecuteFloatingActionButton = (FloatingActionButton) findViewById(R.id.executeTranslateFab);
+
+        mAddFloatingActionButton.setVisibility(View.INVISIBLE);
+        mExecuteFloatingActionButton.setVisibility(View.INVISIBLE);
 
         animateFab();
 
@@ -59,10 +64,10 @@ public class MainActivity extends AppCompatActivity {
         mExecuteFloatingActionButton.setScaleY(0);
 
         AnimatorSet execFabScaling = scalingAnimation(mAddFloatingActionButton);
-        ObjectAnimator execFabSwipe = swipeAnimation(mAddFloatingActionButton);
+        ObjectAnimator execFabSwipe = swipeAnimation(mAddFloatingActionButton, 200, 1);
 
         AnimatorSet addFabScaling = scalingAnimation(mExecuteFloatingActionButton);
-        ObjectAnimator addFabSwipe = swipeAnimation(mExecuteFloatingActionButton);
+        ObjectAnimator addFabSwipe = swipeAnimation(mExecuteFloatingActionButton, 200, 1);
 
         AnimatorSet execAnim = new AnimatorSet();
         execAnim.playTogether(execFabScaling, execFabSwipe);
@@ -75,12 +80,20 @@ public class MainActivity extends AppCompatActivity {
         set.start();
     }
 
-    private ObjectAnimator swipeAnimation(View v){
+    private ObjectAnimator swipeAnimation(View v, int offset, int direction){
+        int off;
+
+        if(direction == -1){
+            off = -offset;
+        } else {
+            off = offset;
+        }
+
         float startValue = v.getX();
 
-        v.setX(v.getX() + 200);
+        v.setVisibility(View.VISIBLE);
 
-        ObjectAnimator anim = ObjectAnimator.ofFloat(v, "x", startValue + 200, startValue);
+        ObjectAnimator anim = ObjectAnimator.ofFloat(v, "x", startValue + off, startValue);
         anim.setInterpolator(new DecelerateInterpolator());
         anim.setDuration(300);
         return anim;
@@ -105,7 +118,18 @@ public class MainActivity extends AppCompatActivity {
         View view = this.getLayoutInflater().inflate(R.layout.activity_main, null, false);
         mInputWordEditText = (EditText) view.findViewById(R.id.inputWordEditText);
         mInputLanguageSpinner = (Spinner) view.findViewById(R.id.inputLanguageSpinner);
+        mTranslateCardView = (CardView) view.findViewById(R.id.translateCardView);
+
+        mTranslateCardView.setVisibility(View.INVISIBLE);
+        animateTranslateCardView();
+
         return view;
+    }
+
+    private void animateTranslateCardView() {
+        ObjectAnimator cardSwipe = swipeAnimation(mTranslateCardView, 1000, -1);
+        cardSwipe.setDuration(1000);
+        cardSwipe.start();
     }
 
     private void createRecyclerView() {
