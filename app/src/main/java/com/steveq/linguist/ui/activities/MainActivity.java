@@ -9,7 +9,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -29,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionMenu mActionMenu;
     private FloatingActionButton mAddFloatingActionButton;
     private FloatingActionButton mExecuteFloatingActionButton;
+    private FloatingActionButton mRefreshFloatingActionButton;
     private CardView mTranslateCardView;
     private TranslatesAdapter mAdapter;
 
@@ -45,43 +45,32 @@ public class MainActivity extends AppCompatActivity {
         mActionMenu = (FloatingActionMenu) findViewById(R.id.floatingActionMenu);
         mAddFloatingActionButton = (FloatingActionButton) findViewById(R.id.addTranslateFab);
         mExecuteFloatingActionButton = (FloatingActionButton) findViewById(R.id.executeTranslateFab);
-//
-//        mAddFloatingActionButton.setVisibility(View.INVISIBLE);
-//        mExecuteFloatingActionButton.setVisibility(View.INVISIBLE);
-//
-//        animateFab();
-//
-//        mAddFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(MainActivity.this, "FAB clicked", Toast.LENGTH_LONG).show();
-//                mAdapter.addOutputOption(new TranslateOutput());
-//                mAdapter.notifyDataSetChanged();
-//            }
-//        });
+        mRefreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.refreshFab);
+
+        mAddFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "add FAB clicked", Toast.LENGTH_LONG).show();
+                mAdapter.addOutputOption(new TranslateOutput());
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+
+        mExecuteFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "exe FAB clicked", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        mRefreshFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "refresh FAB clicked", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
-    private void animateFab() {
-
-        mExecuteFloatingActionButton.setScaleX(0);
-        mExecuteFloatingActionButton.setScaleY(0);
-
-        AnimatorSet execFabScaling = scalingAnimation(mAddFloatingActionButton);
-        ObjectAnimator execFabSwipe = swipeAnimation(mAddFloatingActionButton, 200, 1);
-
-        AnimatorSet addFabScaling = scalingAnimation(mExecuteFloatingActionButton);
-        ObjectAnimator addFabSwipe = swipeAnimation(mExecuteFloatingActionButton, 200, 1);
-
-        AnimatorSet execAnim = new AnimatorSet();
-        execAnim.playTogether(execFabScaling, execFabSwipe);
-
-        AnimatorSet addAnim = new AnimatorSet();
-        addAnim.playTogether(addFabScaling, addFabSwipe);
-
-        AnimatorSet set = new AnimatorSet();
-        set.playSequentially(addAnim, execAnim);
-        set.start();
-    }
 
     private ObjectAnimator swipeAnimation(View v, int offset, int direction){
         int off;

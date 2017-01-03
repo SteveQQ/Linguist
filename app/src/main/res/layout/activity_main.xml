@@ -87,6 +87,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             fab:fab_colorNormal="@color/maetiral_grey_600"
+            fab:fab_colorPressed="@color/maetiral_grey_600"
             android:src="@drawable/ic_arrow_w"
             fab:fab_label="translate"
             fab:fab_size="mini"/>
@@ -96,9 +97,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             fab:fab_colorNormal="@color/maetiral_grey_600"
+            fab:fab_colorPressed="@color/maetiral_grey_600"
             android:src="@drawable/plus_math_w"
             fab:fab_label="add"
             fab:fab_size="mini"/>
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/refreshFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="@color/maetiral_grey_600"
+            fab:fab_colorPressed="@color/maetiral_grey_600"
+            android:src="@drawable/ic_refresh_w"
+            fab:fab_label="refresh"
+            fab:fab_size="mini"/>
+
         </com.github.clans.fab.FloatingActionMenu>
 
 
