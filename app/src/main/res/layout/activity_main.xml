@@ -67,8 +67,6 @@
             android:scrollbars="vertical"/>
     </LinearLayout>
 
-
-
         <com.github.clans.fab.FloatingActionMenu
             android:id="@+id/floatingActionMenu"
             android:layout_width="wrap_content"
@@ -79,27 +77,28 @@
             fab:menu_animationDelayPerItem="55"
             fab:menu_backgroundColor="@android:color/transparent"
             fab:menu_buttonSpacing="0dp"
-            fab:menu_fab_label="Options"
+            fab:menu_colorNormal="@color/maetiral_grey_600"
+            fab:menu_colorPressed="@color/maetiral_grey_600"
             fab:menu_fab_size="normal"
-            fab:menu_icon="@drawable/plus_math"
-            fab:menu_openDirection="up"
-
-            >
+            fab:menu_icon="@drawable/plus_math_w"
+            fab:menu_fab_label="Options">
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/executeTranslateFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow_100"
+            fab:fab_colorNormal="@color/maetiral_grey_600"
+            android:src="@drawable/ic_arrow_w"
             fab:fab_label="translate"
-            app:fabSize="mini"/>
+            fab:fab_size="mini"/>
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/addTranslateFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/plus_math"
+            fab:fab_colorNormal="@color/maetiral_grey_600"
+            android:src="@drawable/plus_math_w"
             fab:fab_label="add"
-            app:fabSize="mini"/>
+            fab:fab_size="mini"/>
         </com.github.clans.fab.FloatingActionMenu>
 
 
