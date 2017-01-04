@@ -14,10 +14,15 @@ import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.steveq.linguist.Api.GlosbeAPI;
+import com.steveq.linguist.Api.GlosbeClient;
 import com.steveq.linguist.R;
 import com.steveq.linguist.adapters.TranslatesAdapter;
 import com.steveq.linguist.model.response.Phrase;
 import com.steveq.linguist.model.response.TranslationResponse;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -60,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements Callback<Translat
     }
 
     private void createRecyclerView() {
-        mAdapter = new TranslatesAdapter();
+        mAdapter = new TranslatesAdapter(this);
         mRecyclerView = (RecyclerView) findViewById(R.id.translatesRecycler);
         mRecyclerView.hasFixedSize();
         RecyclerView.LayoutManager lm = new LinearLayoutManager(this);
@@ -86,16 +91,17 @@ public class MainActivity extends AppCompatActivity implements Callback<Translat
         mExecuteFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, mInputWordEditText.getText(), Toast.LENGTH_LONG).show();
+                String from = mInputLanguageSpinner.getSelectedItem().toString();
+                String dest = mAdapter.getOutputs().get(0).getLanguage();
+                String phrase = mInputWordEditText.getText().toString();
+                Toast.makeText(MainActivity.this, from + dest + phrase, Toast.LENGTH_LONG).show();
 
-//                GlosbeAPI glosbeAPI = GlosbeClient.getClient().create(GlosbeAPI.class);
-//                Map paramsMap = new HashMap();
-//                paramsMap.put("from", "pol");
-//                paramsMap.put("dest", "eng");
-//                paramsMap.put("format", "json");
-//                paramsMap.put("phrase", "witaj");
-//                Call<TranslationResponse> call = glosbeAPI.loadTranslation(paramsMap);
-//                call.enqueue(MainActivity.this);
+                GlosbeAPI glosbeAPI = GlosbeClient.getClient().create(GlosbeAPI.class);
+
+                Map paramsMap = generateParamsMap(from, dest, phrase);
+
+                Call<TranslationResponse> call = glosbeAPI.loadTranslation(paramsMap);
+                call.enqueue(MainActivity.this);
             }
         });
 
@@ -105,6 +111,15 @@ public class MainActivity extends AppCompatActivity implements Callback<Translat
                 Toast.makeText(MainActivity.this, "refresh FAB clicked", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private Map generateParamsMap(String from, String dest, String phrase) {
+        Map paramsMap = new HashMap();
+        paramsMap.put("from", from);
+        paramsMap.put("dest", dest);
+        paramsMap.put("format", "json");
+        paramsMap.put("phrase", phrase);
+        return paramsMap;
     }
 
     private ObjectAnimator swipeAnimation(View v, int offset, int direction){
@@ -134,7 +149,8 @@ public class MainActivity extends AppCompatActivity implements Callback<Translat
 
     @Override
     public void onResponse(Call<TranslationResponse> call, Response<TranslationResponse> response) {
-        Toast.makeText(this, response.body().getTuc().get(0).getPhrase().getText(), Toast.LENGTH_LONG).show();
+        mAdapter.getOutputs().get(0).setText(response.body().getTuc().get(0).getPhrase().getText());
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override

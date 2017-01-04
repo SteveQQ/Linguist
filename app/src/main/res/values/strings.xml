@@ -3,7 +3,7 @@
     <string-array name="langs">
         <item>eng</item>
         <item>pol</item>
-        <item>ger</item>
+        <item>deu</item>
         <item>fra</item>
     </string-array>
 </resources>

@@ -1,12 +1,14 @@
 package com.steveq.linguist.adapters;
 
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -20,10 +22,12 @@ import java.util.List;
 public class TranslatesAdapter extends RecyclerView.Adapter<TranslatesAdapter.ViewHolder> {
 
     private ArrayList<Phrase> mOutputs;
+    Context context;
 
-    public TranslatesAdapter() {
+    public TranslatesAdapter(Context context) {
         mOutputs = new ArrayList<>();
         mOutputs.add(new Phrase());
+        this.context = context;
     }
 
     public ArrayList<Phrase> getOutputs() {
@@ -46,15 +50,37 @@ public class TranslatesAdapter extends RecyclerView.Adapter<TranslatesAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(TranslatesAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(final TranslatesAdapter.ViewHolder holder, int position) {
 
-        Phrase phrase = mOutputs.get(position);
+        final Phrase phrase = mOutputs.get(position);
         holder.outputWord.setText(phrase.getText());
-        if(holder != null){
-            if(position % 4 < 4){
-                holder.outputLanguage.setSelection(position % 4);
+        if(position % 4 < 4 && phrase.getLanguage() == null){
+            holder.outputLanguage.setSelection(position % 4);
+        } else {
+            String[] langs = context.getResources().getStringArray(R.array.langs);
+            int i = 0;
+            for(String el : langs){
+                if(el == phrase.getLanguage()){
+                    holder.outputLanguage.setSelection(i);
+                }
+                i++;
             }
+
         }
+
+        holder.outputLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                phrase.setLanguage(holder.outputLanguage.getSelectedItem().toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                if(phrase.getLanguage() != null) {
+                    phrase.setLanguage(holder.outputLanguage.getSelectedItem().toString());
+                }
+            }
+        });
 
         if(position == mOutputs.size()-1) {
             holder.cardView.setVisibility(View.INVISIBLE);
@@ -100,4 +126,5 @@ public class TranslatesAdapter extends RecyclerView.Adapter<TranslatesAdapter.Vi
         anim.setDuration(300);
         return anim;
     }
+
 }
