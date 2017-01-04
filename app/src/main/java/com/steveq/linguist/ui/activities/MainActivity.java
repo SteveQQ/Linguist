@@ -16,11 +16,24 @@ import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.steveq.linguist.Api.TransltrAPI;
 import com.steveq.linguist.R;
 import com.steveq.linguist.adapters.TranslatesAdapter;
 import com.steveq.linguist.model.TranslateOutput;
+import com.steveq.linguist.model.Translation;
+import com.steveq.linguist.model.TranslationResponse;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.HashMap;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+
+public class MainActivity extends AppCompatActivity implements Callback<TranslationResponse> {
 
     private RecyclerView mRecyclerView;
     private EditText mInputWordEditText;
@@ -60,6 +73,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "exe FAB clicked", Toast.LENGTH_LONG).show();
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl("https://glosbe.com/")
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+                TransltrAPI transltrAPI = retrofit.create(TransltrAPI.class);
+                Map paramsMap = new HashMap();
+                paramsMap.put("from", "pol");
+                paramsMap.put("dest", "eng");
+                paramsMap.put("format", "json");
+                paramsMap.put("phrase", "witaj");
+                Call<TranslationResponse> call = transltrAPI.loadTranslation(paramsMap);
+                call.enqueue(MainActivity.this);
             }
         });
 
@@ -131,5 +157,15 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView.LayoutManager lm = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(lm);
         mRecyclerView.setAdapter(mAdapter);
+    }
+
+    @Override
+    public void onResponse(Call<TranslationResponse> call, Response<TranslationResponse> response) {
+        Toast.makeText(this, response.body().getTuc().get(0).getPhrase().getText(), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onFailure(Call<TranslationResponse> call, Throwable t) {
+        Toast.makeText(this, t.getMessage(), Toast.LENGTH_LONG).show();
     }
 }
