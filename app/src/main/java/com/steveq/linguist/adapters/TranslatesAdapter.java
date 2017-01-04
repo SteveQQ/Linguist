@@ -11,7 +11,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.steveq.linguist.R;
-import com.steveq.linguist.model.TranslateOutput;
+import com.steveq.linguist.model.response.Phrase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,30 +19,28 @@ import java.util.List;
 
 public class TranslatesAdapter extends RecyclerView.Adapter<TranslatesAdapter.ViewHolder> {
 
-    private ArrayList<TranslateOutput> mOutputOptions;
-    private List<String> languageOptions;
+    private ArrayList<Phrase> mOutputs;
 
     public TranslatesAdapter() {
-        mOutputOptions = new ArrayList<>();
-        mOutputOptions.add(new TranslateOutput());
+        mOutputs = new ArrayList<>();
+        mOutputs.add(new Phrase());
     }
 
-    public ArrayList<TranslateOutput> getOutputOptions() {
-        return mOutputOptions;
+    public ArrayList<Phrase> getOutputs() {
+        return mOutputs;
     }
 
-    public void setOutputOptions(ArrayList<TranslateOutput> outputOptions) {
-        mOutputOptions = outputOptions;
+    public void setOutputs(ArrayList<Phrase> outputs) {
+        mOutputs = outputs;
     }
-    public void addOutputOption(TranslateOutput option){
-        mOutputOptions.add(option);
+    public void addOutputOption(Phrase option){
+        mOutputs.add(option);
     }
 
     @Override
     public TranslatesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.translate_card, parent, false);
-        languageOptions = Arrays.asList(parent.getContext().getResources().getStringArray(R.array.langs));
 
         return new ViewHolder(view);
     }
@@ -50,31 +48,23 @@ public class TranslatesAdapter extends RecyclerView.Adapter<TranslatesAdapter.Vi
     @Override
     public void onBindViewHolder(TranslatesAdapter.ViewHolder holder, int position) {
 
-        TranslateOutput translateOutput = mOutputOptions.get(position);
-        holder.outputWord.setText(translateOutput.getOutput());
-        holder.outputLanguage.setSelection(getLanguageIndex(translateOutput.getOutputLanguage()));
+        Phrase phrase = mOutputs.get(position);
+        holder.outputWord.setText(phrase.getText());
+        if(holder != null){
+            if(position % 4 < 4){
+                holder.outputLanguage.setSelection(position % 4);
+            }
+        }
 
-        if(position == mOutputOptions.size()-1) {
+        if(position == mOutputs.size()-1) {
             holder.cardView.setVisibility(View.INVISIBLE);
             swipeAnimation(holder.cardView, 1000, -1).setDuration(1000).start();
         }
     }
 
-    private int getLanguageIndex(String outputLanguage) {
-        int index = -1;
-
-        for(String lan : languageOptions){
-            if(lan.equals(outputLanguage)){
-                return index;
-            }
-        }
-
-        return index;
-    }
-
     @Override
     public int getItemCount() {
-        return mOutputOptions.size();
+        return mOutputs.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

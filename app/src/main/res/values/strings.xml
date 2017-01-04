@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Linguist</string>
     <string-array name="langs">
-        <item>ENG</item>
-        <item>PL</item>
-        <item>GER</item>
-        <item>FR</item>
+        <item>eng</item>
+        <item>pol</item>
+        <item>ger</item>
+        <item>fra</item>
     </string-array>
 </resources>

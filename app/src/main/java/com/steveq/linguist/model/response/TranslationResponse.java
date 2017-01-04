@@ -1,4 +1,4 @@
-package com.steveq.linguist.model;
+package com.steveq.linguist.model.response;
 
 import java.util.List;
 

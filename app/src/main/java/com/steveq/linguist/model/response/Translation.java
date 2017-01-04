@@ -1,4 +1,4 @@
-package com.steveq.linguist.model;
+package com.steveq.linguist.model.response;
 
 public class Translation {
     Phrase phrase;
