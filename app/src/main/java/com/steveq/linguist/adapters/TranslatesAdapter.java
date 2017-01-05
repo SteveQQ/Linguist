@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class TranslatesAdapter extends RecyclerView.Adapter<TranslatesAdapter.ViewHolder> {
 
     private int prevItemCount = 0;
-    private ArrayList<Phrase> mOutputs;
+    public static ArrayList<Phrase> mOutputs;
     Context context;
 
     public TranslatesAdapter(Context context) {

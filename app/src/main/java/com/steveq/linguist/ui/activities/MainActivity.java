@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.steveq.linguist.Api.GlosbeAPI;
+import com.steveq.linguist.Api.GlosbeCallback;
 import com.steveq.linguist.Api.GlosbeClient;
 import com.steveq.linguist.R;
 import com.steveq.linguist.adapters.TranslatesAdapter;
@@ -29,15 +30,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class MainActivity extends AppCompatActivity implements Callback<TranslationResponse> {
+public class MainActivity extends AppCompatActivity{
 
     private RecyclerView mRecyclerView;
     private EditText mInputWordEditText;
     private Spinner mInputLanguageSpinner;
-    private FloatingActionMenu mActionMenu;
-    private FloatingActionButton mAddFloatingActionButton;
-    private FloatingActionButton mExecuteFloatingActionButton;
-    private FloatingActionButton mRefreshFloatingActionButton;
     private CardView mTranslateCardView;
     private TranslatesAdapter mAdapter;
 
@@ -73,18 +70,15 @@ public class MainActivity extends AppCompatActivity implements Callback<Translat
         mRecyclerView.setAdapter(mAdapter);
     }
 
-
-
     private void creatFAB() {
-        mActionMenu = (FloatingActionMenu) findViewById(R.id.floatingActionMenu);
-        mAddFloatingActionButton = (FloatingActionButton) findViewById(R.id.addTranslateFab);
-        mExecuteFloatingActionButton = (FloatingActionButton) findViewById(R.id.executeTranslateFab);
-        mRefreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.refreshFab);
+        FloatingActionMenu mActionMenu = (FloatingActionMenu) findViewById(R.id.floatingActionMenu);
+        FloatingActionButton mAddFloatingActionButton = (FloatingActionButton) findViewById(R.id.addTranslateFab);
+        FloatingActionButton mExecuteFloatingActionButton = (FloatingActionButton) findViewById(R.id.executeTranslateFab);
+        FloatingActionButton mRefreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.refreshFab);
 
         mAddFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "add FAB clicked", Toast.LENGTH_LONG).show();
                 String[] langs = getResources().getStringArray(R.array.langs);
                 mAdapter.addOutputOption(new Phrase(langs[mAdapter.getOutputs().size()%4]));
                 mAdapter.notifyDataSetChanged();
@@ -100,10 +94,8 @@ public class MainActivity extends AppCompatActivity implements Callback<Translat
                     String dest = mAdapter.getOutputs().get(i).getLanguage();
                     GlosbeAPI glosbeAPI = GlosbeClient.getClient().create(GlosbeAPI.class);
 
-                    Map paramsMap = generateParamsMap(from, dest, phrase);
-
-                    Call<TranslationResponse> call = glosbeAPI.loadTranslation(paramsMap);
-                    call.enqueue(MainActivity.this);
+                    Call<TranslationResponse> call = glosbeAPI.loadTranslation(generateParamsMap(from, dest, phrase));
+                    call.enqueue(new GlosbeCallback(mAdapter, MainActivity.this));
                 }
             }
         });
@@ -111,7 +103,9 @@ public class MainActivity extends AppCompatActivity implements Callback<Translat
         mRefreshFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "refresh FAB clicked", Toast.LENGTH_LONG).show();
+                mAdapter = new TranslatesAdapter(MainActivity.this);
+                mRecyclerView.setAdapter(mAdapter);
+                mInputWordEditText.setText("");
             }
         });
     }
@@ -148,25 +142,5 @@ public class MainActivity extends AppCompatActivity implements Callback<Translat
         ObjectAnimator cardSwipe = swipeAnimation(mTranslateCardView, 1000, -1);
         cardSwipe.setDuration(1000);
         cardSwipe.start();
-    }
-
-    @Override
-    public void onResponse(Call<TranslationResponse> call, Response<TranslationResponse> response) {
-
-        String translatedText = response.body().getTuc().get(0).getPhrase().getText();
-        String destLan = response.body().getTuc().get(0).getPhrase().getLanguage();
-        for(int i=0; i < mAdapter.getOutputs().size(); i++){
-            String destLanKeep = mAdapter.getOutputs().get(i).getLanguageCropped();
-
-            if(destLan.equals(destLanKeep)){
-                mAdapter.getOutputs().get(i).setText(translatedText);
-            }
-        }
-        mAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onFailure(Call<TranslationResponse> call, Throwable t) {
-        Toast.makeText(this, t.getMessage(), Toast.LENGTH_LONG).show();
     }
 }
