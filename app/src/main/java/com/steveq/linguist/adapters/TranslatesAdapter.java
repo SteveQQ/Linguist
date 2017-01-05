@@ -29,6 +29,11 @@ public class TranslatesAdapter extends RecyclerView.Adapter<TranslatesAdapter.Vi
         this.context = context;
     }
 
+    public TranslatesAdapter(ArrayList phrases, Context context) {
+        mOutputs = new ArrayList<>(phrases);
+        this.context = context;
+    }
+
     public ArrayList<Phrase> getOutputs() {
         return mOutputs;
     }

@@ -1,6 +1,9 @@
 package com.steveq.linguist.model.response;
 
-public class Phrase {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Phrase implements Parcelable{
     String text;
     String language;
 
@@ -9,6 +12,11 @@ public class Phrase {
     }
     public Phrase(String lan){
         setLanguage(lan);
+    }
+
+    private Phrase(Parcel in){
+        text = in.readString();
+        language = in.readString();
     }
 
     public String getText() {
@@ -34,4 +42,27 @@ public class Phrase {
     public void setLanguage(String language) {
         this.language = language;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(text);
+        dest.writeString(language);
+    }
+
+    public static final Parcelable.Creator<Phrase> CREATOR = new Parcelable.Creator<Phrase>(){
+        @Override
+        public Phrase createFromParcel(Parcel source) {
+            return new Phrase(source);
+        }
+
+        @Override
+        public Phrase[] newArray(int size) {
+            return new Phrase[size];
+        }
+    };
 }

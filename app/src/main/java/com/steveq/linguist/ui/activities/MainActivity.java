@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -22,12 +21,11 @@ import com.steveq.linguist.adapters.TranslatesAdapter;
 import com.steveq.linguist.model.response.Phrase;
 import com.steveq.linguist.model.response.TranslationResponse;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 
 public class MainActivity extends AppCompatActivity{
@@ -43,8 +41,18 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
 
         setContentView(createActivityView());
-        createRecyclerView();
+        if(savedInstanceState != null) {
+            createRecyclerView(savedInstanceState.getParcelableArrayList("PHRASES"));
+        } else {
+            createRecyclerView(null);
+        }
         creatFAB();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("PHRASES", mAdapter.getOutputs());
     }
 
     private View createActivityView(){
@@ -61,8 +69,12 @@ public class MainActivity extends AppCompatActivity{
         return view;
     }
 
-    private void createRecyclerView() {
-        mAdapter = new TranslatesAdapter(this);
+    private void createRecyclerView(ArrayList phrases) {
+        if(phrases == null) {
+            mAdapter = new TranslatesAdapter(this);
+        } else {
+            mAdapter = new TranslatesAdapter(phrases, this);
+        }
         mRecyclerView = (RecyclerView) findViewById(R.id.translatesRecycler);
         mRecyclerView.hasFixedSize();
         RecyclerView.LayoutManager lm = new LinearLayoutManager(this);
