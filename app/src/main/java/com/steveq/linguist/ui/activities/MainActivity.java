@@ -2,6 +2,7 @@ package com.steveq.linguist.ui.activities;
 
 import android.animation.ObjectAnimator;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,6 +12,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -19,6 +21,7 @@ import com.steveq.linguist.Api.GlosbeCallback;
 import com.steveq.linguist.Api.GlosbeClient;
 import com.steveq.linguist.R;
 import com.steveq.linguist.adapters.TranslatesAdapter;
+import com.steveq.linguist.database.TranslationsDataSource;
 import com.steveq.linguist.model.response.Phrase;
 import com.steveq.linguist.model.response.TranslationResponse;
 
@@ -37,6 +40,8 @@ public class MainActivity extends AppCompatActivity{
     private CardView mTranslateCardView;
     private TranslatesAdapter mAdapter;
     public ProgressBar mProgressBar;
+    private TranslationsDataSource translationsDataSource;
+    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +54,25 @@ public class MainActivity extends AppCompatActivity{
             createRecyclerView(null);
         }
         creatFAB();
+        Thread dbCreateThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                createDB();
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this, "db created", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+        dbCreateThread.setName("dbCreateThread");
+        dbCreateThread.start();
+    }
+
+    private void createDB() {
+        translationsDataSource = new TranslationsDataSource(this);
+        translationsDataSource.initDB();
     }
 
     @Override
@@ -63,6 +87,7 @@ public class MainActivity extends AppCompatActivity{
         mInputLanguageSpinner = (Spinner) view.findViewById(R.id.inputLanguageSpinner);
         mTranslateCardView = (CardView) view.findViewById(R.id.translateCardView);
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        mHandler = new Handler();
 
         mTranslateCardView.setVisibility(View.INVISIBLE);
         animateTranslateCardView();

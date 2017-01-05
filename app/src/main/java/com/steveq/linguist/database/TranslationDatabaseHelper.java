@@ -25,7 +25,7 @@ public class TranslationDatabaseHelper extends SQLiteOpenHelper {
     //ATTRIBUTES:
     //LANGUAGES TABLE
     public static final String LANGUAGES_TABLE = "languages_table";
-    public static final String COLUMN_LANGUAGES_LANGUAGE = "language"
+    public static final String COLUMN_LANGUAGES_LANGUAGE = "language";
 
     public TranslationDatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
