@@ -25,7 +25,7 @@ public class TranslatesAdapter extends RecyclerView.Adapter<TranslatesAdapter.Vi
 
     public TranslatesAdapter(Context context) {
         mOutputs = new ArrayList<>();
-        mOutputs.add(new Phrase());
+        mOutputs.add(new Phrase("eng"));
         this.context = context;
     }
 
@@ -53,19 +53,7 @@ public class TranslatesAdapter extends RecyclerView.Adapter<TranslatesAdapter.Vi
 
         final Phrase phrase = mOutputs.get(position);
         holder.outputWord.setText(phrase.getText());
-        if(position % 4 < 4 && phrase.getLanguage() == null){
-            holder.outputLanguage.setSelection(position % 4);
-        } else {
-            String[] langs = context.getResources().getStringArray(R.array.langs);
-            int i = 0;
-            for(String el : langs){
-                if(el == phrase.getLanguage()){
-                    holder.outputLanguage.setSelection(i);
-                }
-                i++;
-            }
-
-        }
+        holder.outputLanguage.setSelection(getLanPosition(mOutputs.get(position).getLanguage()));
 
         holder.outputLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -127,4 +115,16 @@ public class TranslatesAdapter extends RecyclerView.Adapter<TranslatesAdapter.Vi
         return anim;
     }
 
+    private int getLanPosition(String lan){
+        String[] langs = context.getResources().getStringArray(R.array.langs);
+        int i = 0;
+        for(String el : langs){
+            if(el.equals(lan)){
+                return i;
+            }
+            i++;
+        }
+        i=-1;
+        return i;
+    }
 }

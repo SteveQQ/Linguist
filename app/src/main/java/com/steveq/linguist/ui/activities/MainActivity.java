@@ -73,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements Callback<Translat
         mRecyclerView.setAdapter(mAdapter);
     }
 
+
+
     private void creatFAB() {
         mActionMenu = (FloatingActionMenu) findViewById(R.id.floatingActionMenu);
         mAddFloatingActionButton = (FloatingActionButton) findViewById(R.id.addTranslateFab);
@@ -83,7 +85,8 @@ public class MainActivity extends AppCompatActivity implements Callback<Translat
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "add FAB clicked", Toast.LENGTH_LONG).show();
-                mAdapter.addOutputOption(new Phrase());
+                String[] langs = getResources().getStringArray(R.array.langs);
+                mAdapter.addOutputOption(new Phrase(langs[mAdapter.getOutputs().size()%4]));
                 mAdapter.notifyDataSetChanged();
             }
         });
@@ -153,7 +156,8 @@ public class MainActivity extends AppCompatActivity implements Callback<Translat
         String translatedText = response.body().getTuc().get(0).getPhrase().getText();
         String destLan = response.body().getTuc().get(0).getPhrase().getLanguage();
         for(int i=0; i < mAdapter.getOutputs().size(); i++){
-            String destLanKeep = mAdapter.getOutputs().get(i).getLanguage().substring(0, 2);
+            String destLanKeep = mAdapter.getOutputs().get(i).getLanguageCropped();
+
             if(destLan.equals(destLanKeep)){
                 mAdapter.getOutputs().get(i).setText(translatedText);
             }
