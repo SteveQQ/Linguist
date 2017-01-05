@@ -5,7 +5,7 @@ This project is about translating words using Google Translation API.
 Below I present list of features you can find in MVP:
 
 1. Using of floating button
-2. Using of Google Translation API
+2. Using of Translation API
 3. Using of retrofit API
 4. Animation on app starting
 5. Caching searches in SQLite
