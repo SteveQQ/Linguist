@@ -16,11 +16,10 @@ import com.steveq.linguist.R;
 import com.steveq.linguist.model.response.Phrase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class TranslatesAdapter extends RecyclerView.Adapter<TranslatesAdapter.ViewHolder> {
 
+    private int prevItemCount = 0;
     private ArrayList<Phrase> mOutputs;
     Context context;
 
@@ -82,9 +81,10 @@ public class TranslatesAdapter extends RecyclerView.Adapter<TranslatesAdapter.Vi
             }
         });
 
-        if(position == mOutputs.size()-1) {
+        if(position == mOutputs.size()-1 && mOutputs.size() > prevItemCount) {
             holder.cardView.setVisibility(View.INVISIBLE);
             swipeAnimation(holder.cardView, 1000, -1).setDuration(1000).start();
+            prevItemCount++;
         }
     }
 

@@ -30,4 +30,5 @@ public class TranslationResponse {
     public void setPhrase(String phrase) {
         this.phrase = phrase;
     }
+
 }

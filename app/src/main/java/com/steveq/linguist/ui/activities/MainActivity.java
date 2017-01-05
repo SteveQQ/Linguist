@@ -92,16 +92,16 @@ public class MainActivity extends AppCompatActivity implements Callback<Translat
             @Override
             public void onClick(View v) {
                 String from = mInputLanguageSpinner.getSelectedItem().toString();
-                String dest = mAdapter.getOutputs().get(0).getLanguage();
                 String phrase = mInputWordEditText.getText().toString();
-                Toast.makeText(MainActivity.this, from + dest + phrase, Toast.LENGTH_LONG).show();
+                for(int i=0; i < mAdapter.getOutputs().size(); i++) {
+                    String dest = mAdapter.getOutputs().get(i).getLanguage();
+                    GlosbeAPI glosbeAPI = GlosbeClient.getClient().create(GlosbeAPI.class);
 
-                GlosbeAPI glosbeAPI = GlosbeClient.getClient().create(GlosbeAPI.class);
+                    Map paramsMap = generateParamsMap(from, dest, phrase);
 
-                Map paramsMap = generateParamsMap(from, dest, phrase);
-
-                Call<TranslationResponse> call = glosbeAPI.loadTranslation(paramsMap);
-                call.enqueue(MainActivity.this);
+                    Call<TranslationResponse> call = glosbeAPI.loadTranslation(paramsMap);
+                    call.enqueue(MainActivity.this);
+                }
             }
         });
 
@@ -149,7 +149,15 @@ public class MainActivity extends AppCompatActivity implements Callback<Translat
 
     @Override
     public void onResponse(Call<TranslationResponse> call, Response<TranslationResponse> response) {
-        mAdapter.getOutputs().get(0).setText(response.body().getTuc().get(0).getPhrase().getText());
+
+        String translatedText = response.body().getTuc().get(0).getPhrase().getText();
+        String destLan = response.body().getTuc().get(0).getPhrase().getLanguage();
+        for(int i=0; i < mAdapter.getOutputs().size(); i++){
+            String destLanKeep = mAdapter.getOutputs().get(i).getLanguage().substring(0, 2);
+            if(destLan.equals(destLanKeep)){
+                mAdapter.getOutputs().get(i).setText(translatedText);
+            }
+        }
         mAdapter.notifyDataSetChanged();
     }
 
