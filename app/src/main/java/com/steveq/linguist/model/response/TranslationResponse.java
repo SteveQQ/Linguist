@@ -6,6 +6,7 @@ public class TranslationResponse {
     private String result;
     private List<Translation> tuc;
     String phrase;
+    private String from;
 
     public String getResult() {
         return result;
@@ -31,4 +32,20 @@ public class TranslationResponse {
         this.phrase = phrase;
     }
 
+    public String getFrom() {
+        if(this.from.equals("pl")){
+            return "pol";
+        } else if(from.equals("de")){
+            return "deu";
+        } else if(from.equals("fr")){
+            return "fra";
+        } else if(from.equals("en")){
+            return "eng";
+        }
+        return null;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
 }
