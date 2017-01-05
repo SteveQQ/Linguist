@@ -21,18 +21,19 @@ public class TranslatesAdapter extends RecyclerView.Adapter<TranslatesAdapter.Vi
 
     private int prevItemCount = 0;
     public static ArrayList<Phrase> mOutputs;
-    Context context;
+    private Context context;
 
+    public TranslatesAdapter(ArrayList phrases, Context ctx) {
+        mOutputs = new ArrayList<>(phrases);
+        this.context = ctx;
+    }
     public TranslatesAdapter(Context context) {
         mOutputs = new ArrayList<>();
         mOutputs.add(new Phrase("eng"));
         this.context = context;
     }
 
-    public TranslatesAdapter(ArrayList phrases, Context context) {
-        mOutputs = new ArrayList<>(phrases);
-        this.context = context;
-    }
+
 
     public ArrayList<Phrase> getOutputs() {
         return mOutputs;
@@ -74,7 +75,8 @@ public class TranslatesAdapter extends RecyclerView.Adapter<TranslatesAdapter.Vi
             }
         });
 
-        if(position == mOutputs.size()-1 && mOutputs.size() > prevItemCount) {
+        if(position == mOutputs.size()-1 && mOutputs.size() > prevItemCount ||
+                mOutputs.size() > prevItemCount+1) {
             holder.cardView.setVisibility(View.INVISIBLE);
             swipeAnimation(holder.cardView, 1000, -1).setDuration(1000).start();
             prevItemCount++;

@@ -1,11 +1,14 @@
 package com.steveq.linguist.Api;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.Toast;
 
 import com.steveq.linguist.adapters.TranslatesAdapter;
 import com.steveq.linguist.model.response.TranslationResponse;
+import com.steveq.linguist.ui.activities.MainActivity;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -14,11 +17,11 @@ import retrofit2.Response;
 public class GlosbeCallback implements Callback<TranslationResponse> {
 
     private TranslatesAdapter mAdapter;
-    private Context mContext;
+    private MainActivity mActivity;
 
-    public GlosbeCallback(TranslatesAdapter adapter, Context context){
+    public GlosbeCallback(TranslatesAdapter adapter, Activity activity){
         mAdapter = adapter;
-        mContext = context;
+        mActivity = (MainActivity)activity;
     }
 
     @Override
@@ -33,10 +36,12 @@ public class GlosbeCallback implements Callback<TranslationResponse> {
             }
         }
         mAdapter.notifyDataSetChanged();
+        mActivity.mProgressBar.setVisibility(View.GONE);
     }
 
     @Override
     public void onFailure(Call<TranslationResponse> call, Throwable t) {
-        Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_LONG).show();
+        Toast.makeText(mActivity, t.getMessage(), Toast.LENGTH_LONG).show();
+        mActivity.mProgressBar.setVisibility(View.GONE);
     }
 }

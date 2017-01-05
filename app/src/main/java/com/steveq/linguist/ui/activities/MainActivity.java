@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 import com.github.clans.fab.FloatingActionButton;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity{
     private Spinner mInputLanguageSpinner;
     private CardView mTranslateCardView;
     private TranslatesAdapter mAdapter;
+    public ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,17 +62,20 @@ public class MainActivity extends AppCompatActivity{
         mInputWordEditText = (EditText) view.findViewById(R.id.inputWordEditText);
         mInputLanguageSpinner = (Spinner) view.findViewById(R.id.inputLanguageSpinner);
         mTranslateCardView = (CardView) view.findViewById(R.id.translateCardView);
+        mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
         mTranslateCardView.setVisibility(View.INVISIBLE);
         animateTranslateCardView();
 
         mInputLanguageSpinner.setSelection(1);
 
+        mProgressBar.setVisibility(View.GONE);
+
         return view;
     }
 
     private void createRecyclerView(ArrayList phrases) {
-        if(phrases == null) {
+        if(phrases == null){
             mAdapter = new TranslatesAdapter(this);
         } else {
             mAdapter = new TranslatesAdapter(phrases, this);
@@ -108,6 +113,7 @@ public class MainActivity extends AppCompatActivity{
 
                     Call<TranslationResponse> call = glosbeAPI.loadTranslation(generateParamsMap(from, dest, phrase));
                     call.enqueue(new GlosbeCallback(mAdapter, MainActivity.this));
+                    mProgressBar.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -118,6 +124,7 @@ public class MainActivity extends AppCompatActivity{
                 mAdapter = new TranslatesAdapter(MainActivity.this);
                 mRecyclerView.setAdapter(mAdapter);
                 mInputWordEditText.setText("");
+                mInputLanguageSpinner.setSelection(1);
             }
         });
     }
