@@ -61,33 +61,45 @@ public class TranslationsDataSource {
     }
 
     public void insertWord(TranslationResponse translationResponse){
-//        SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
-//        db.beginTransaction();
-//
-//        ContentValues wordValues = new ContentValues();
-//        wordValues.put(mTranslationDatabaseHelper.COLUMN_WORDS_WORD, translationResponse.getPhrase());
-//        wordValues.put(mTranslationDatabaseHelper.COLUMN_TRANSLATIONS_LANGUAGE_FK, getTranslationId(translationResponse.get))
-//
-//        db.setTransactionSuccessful();
-//        db.endTransaction();
-//        db.close();
+        SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
+        db.beginTransaction();
+
+        ContentValues wordValues = new ContentValues();
+        wordValues.put(mTranslationDatabaseHelper.COLUMN_WORDS_WORD, translationResponse.getPhrase());
+        wordValues.put(mTranslationDatabaseHelper.COLUMN_WORDS_TRANSLATIONS_FK, getTranslationId(translationResponse.getTuc().get(0).getPhrase().getText()));
+        db.insert(mTranslationDatabaseHelper.WORDS_TABLE,
+                null,
+                wordValues);
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
     }
 
-    public int getLanguageId(String language){
+    private int getTranslationId(String text) {
+        SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
+        db.beginTransaction();
+        int transId = -1;
+        Cursor cursor = db.rawQuery("SELECT * FROM " + mTranslationDatabaseHelper.TRANSLATIONS_TABLE +
+                " WHERE " + mTranslationDatabaseHelper.COLUMN_TRANSLATIONS_WORD +
+                "=" + "\"" + text + "\"" + ";", null);
+        if(cursor.moveToFirst()) {
+            int index = cursor.getColumnIndex(BaseColumns._ID);
+            transId = cursor.getInt(index);
+            cursor.close();
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        return transId;
+    }
+
+    private int getLanguageId(String language){
         SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
         db.beginTransaction();
         int lanId = -1;
         Cursor cursor = db.rawQuery("SELECT * FROM " + mTranslationDatabaseHelper.LANGUAGES_TABLE +
                                     " WHERE " + mTranslationDatabaseHelper.COLUMN_LANGUAGES_LANGUAGE +
                                     "=" + "\"" + language + "\"" + ";", null);
-//        Cursor cursor = db.query(mTranslationDatabaseHelper.LANGUAGES_TABLE,
-//                new String[]{BaseColumns._ID, mTranslationDatabaseHelper.COLUMN_LANGUAGES_LANGUAGE},
-//                mTranslationDatabaseHelper.COLUMN_LANGUAGES_LANGUAGE + "=" + language,
-//                null,
-//                null,
-//                null,
-//                null,
-//                null);
         if(cursor.moveToFirst()) {
             int index = cursor.getColumnIndex(BaseColumns._ID);
             lanId = cursor.getInt(index);

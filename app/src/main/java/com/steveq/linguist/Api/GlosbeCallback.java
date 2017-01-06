@@ -31,6 +31,7 @@ public class GlosbeCallback implements Callback<TranslationResponse> {
     public void onResponse(Call<TranslationResponse> call, Response<TranslationResponse> response) {
         String translatedText = response.body().getTuc().get(0).getPhrase().getText();
         String destLan = response.body().getTuc().get(0).getPhrase().getLanguage();
+
         for(int i=0; i < mAdapter.getOutputs().size(); i++){
             String destLanKeep = mAdapter.getOutputs().get(i).getLanguageCropped();
             if(destLan.equals(destLanKeep)){
@@ -38,6 +39,8 @@ public class GlosbeCallback implements Callback<TranslationResponse> {
                 mDataSource.insertTranslation(response.body().getTuc().get(0).getPhrase());
             }
         }
+
+        mDataSource.insertWord(response.body());
         mAdapter.notifyDataSetChanged();
         mActivity.mProgressBar.setVisibility(View.GONE);
     }
