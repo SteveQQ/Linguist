@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity{
                     GlosbeAPI glosbeAPI = GlosbeClient.getClient().create(GlosbeAPI.class);
 
                     Call<TranslationResponse> call = glosbeAPI.loadTranslation(generateParamsMap(from, dest, phrase));
-                    call.enqueue(new GlosbeCallback(mAdapter, MainActivity.this));
+                    call.enqueue(new GlosbeCallback(mAdapter, translationsDataSource, MainActivity.this));
                     mProgressBar.setVisibility(View.VISIBLE);
                 }
             }

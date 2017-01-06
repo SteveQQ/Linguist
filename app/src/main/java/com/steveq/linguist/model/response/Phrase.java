@@ -27,8 +27,21 @@ public class Phrase implements Parcelable{
         this.text = text;
     }
 
-    public String getLanguage() {
+    public String getLanguage(){
         return language;
+    }
+
+    public String getLanguageLong() {
+        if(language.equals("pl")){
+            return "pol";
+        } else if(language.equals("de")){
+            return "deu";
+        } else if(language.equals("fr")){
+            return "fra";
+        } else if(language.equals("en")){
+            return "eng";
+        }
+        return null;
     }
 
     public String getLanguageCropped(){

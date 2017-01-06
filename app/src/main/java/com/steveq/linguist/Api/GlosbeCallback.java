@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.steveq.linguist.adapters.TranslatesAdapter;
+import com.steveq.linguist.database.TranslationsDataSource;
 import com.steveq.linguist.model.response.TranslationResponse;
 import com.steveq.linguist.ui.activities.MainActivity;
 
@@ -18,10 +19,12 @@ public class GlosbeCallback implements Callback<TranslationResponse> {
 
     private TranslatesAdapter mAdapter;
     private MainActivity mActivity;
+    private TranslationsDataSource mDataSource;
 
-    public GlosbeCallback(TranslatesAdapter adapter, Activity activity){
+    public GlosbeCallback(TranslatesAdapter adapter, TranslationsDataSource dataSource, Activity activity){
         mAdapter = adapter;
         mActivity = (MainActivity)activity;
+        mDataSource = dataSource;
     }
 
     @Override
@@ -30,9 +33,9 @@ public class GlosbeCallback implements Callback<TranslationResponse> {
         String destLan = response.body().getTuc().get(0).getPhrase().getLanguage();
         for(int i=0; i < mAdapter.getOutputs().size(); i++){
             String destLanKeep = mAdapter.getOutputs().get(i).getLanguageCropped();
-
             if(destLan.equals(destLanKeep)){
                 mAdapter.getOutputs().get(i).setText(translatedText);
+                mDataSource.insertTranslation(response.body().getTuc().get(0).getPhrase());
             }
         }
         mAdapter.notifyDataSetChanged();
