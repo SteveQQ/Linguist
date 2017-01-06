@@ -36,9 +36,10 @@ public class TranslationDatabaseHelper extends SQLiteOpenHelper {
     private static String CREATE_WORDS_TABLE =
             "CREATE TABLE " + WORDS_TABLE + " (" +
                     BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    COLUMN_WORDS_WORD + " TEXT NOT NULL UNIQUE, " +
+                    COLUMN_WORDS_WORD + " TEXT NOT NULL, " +
                     COLUMN_WORDS_TRANSLATIONS_FK + " INTEGER NOT NULL, " +
-                    "FOREIGN KEY (" + COLUMN_WORDS_TRANSLATIONS_FK + ") REFERENCES TRANSLATIONS(_id));";
+                    "FOREIGN KEY (" + COLUMN_WORDS_TRANSLATIONS_FK + ") REFERENCES TRANSLATIONS(_id), " +
+                    "UNIQUE(" + COLUMN_WORDS_WORD + ", " + COLUMN_WORDS_TRANSLATIONS_FK + "));";
 
     //CREATE TRANSLATIONS TABLE
     private static String CREATE_TRANSLATIONS_TABLE =

@@ -36,11 +36,12 @@ public class GlosbeCallback implements Callback<TranslationResponse> {
             String destLanKeep = mAdapter.getOutputs().get(i).getLanguageCropped();
             if(destLan.equals(destLanKeep)){
                 mAdapter.getOutputs().get(i).setText(translatedText);
-                mDataSource.insertTranslation(response.body().getTuc().get(0).getPhrase());
             }
         }
 
+        mDataSource.insertTranslation(response.body().getTuc().get(0).getPhrase());
         mDataSource.insertWord(response.body());
+
         mAdapter.notifyDataSetChanged();
         mActivity.mProgressBar.setVisibility(View.GONE);
     }

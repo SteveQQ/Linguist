@@ -132,13 +132,27 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(View v) {
                 String from = mInputLanguageSpinner.getSelectedItem().toString();
                 String phrase = mInputWordEditText.getText().toString();
-                for(int i=0; i < mAdapter.getOutputs().size(); i++) {
-                    String dest = mAdapter.getOutputs().get(i).getLanguage();
-                    GlosbeAPI glosbeAPI = GlosbeClient.getClient().create(GlosbeAPI.class);
+                if(translationsDataSource.isWord(phrase)){
 
-                    Call<TranslationResponse> call = glosbeAPI.loadTranslation(generateParamsMap(from, dest, phrase));
-                    call.enqueue(new GlosbeCallback(mAdapter, translationsDataSource, MainActivity.this));
-                    mProgressBar.setVisibility(View.VISIBLE);
+                    for(int i=0; i < mAdapter.getOutputs().size(); i++){
+                        String translatedText = translationsDataSource.getTranslation(phrase, mAdapter.getOutputs().get(i).getLanguage());
+                        mAdapter.getOutputs().get(i).setText(translatedText);
+                        mAdapter.notifyDataSetChanged();
+//                        String destLanKeep = mAdapter.getOutputs().get(i).getLanguageLong();
+//                        if(destLan.equals(destLanKeep)){
+//                            mAdapter.getOutputs().get(i).setText(translatedText);
+//                            mDataSource.insertTranslation(response.body().getTuc().get(0).getPhrase());
+//                        }
+                    }
+                }else {
+                    for (int i = 0; i < mAdapter.getOutputs().size(); i++) {
+                        String dest = mAdapter.getOutputs().get(i).getLanguage();
+                        GlosbeAPI glosbeAPI = GlosbeClient.getClient().create(GlosbeAPI.class);
+
+                        Call<TranslationResponse> call = glosbeAPI.loadTranslation(generateParamsMap(from, dest, phrase));
+                        call.enqueue(new GlosbeCallback(mAdapter, translationsDataSource, MainActivity.this));
+                        mProgressBar.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         });
