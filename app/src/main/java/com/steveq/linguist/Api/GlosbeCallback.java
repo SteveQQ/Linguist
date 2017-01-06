@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.steveq.linguist.adapters.TranslatesAdapter;
 import com.steveq.linguist.database.TranslationsDataSource;
+import com.steveq.linguist.model.response.Phrase;
 import com.steveq.linguist.model.response.TranslationResponse;
 import com.steveq.linguist.ui.activities.MainActivity;
 
@@ -29,21 +30,36 @@ public class GlosbeCallback implements Callback<TranslationResponse> {
 
     @Override
     public void onResponse(Call<TranslationResponse> call, Response<TranslationResponse> response) {
-        String translatedText = response.body().getTuc().get(0).getPhrase().getText();
-        String destLan = response.body().getTuc().get(0).getPhrase().getLanguage();
+        int reponseIndex = 0;
+        final TranslationResponse responseBody = response.body();
+        if(responseBody.getTuc().size() > 0 && responseBody.getTuc().get(0).getPhrase() != null) {
 
-        for(int i=0; i < mAdapter.getOutputs().size(); i++){
-            String destLanKeep = mAdapter.getOutputs().get(i).getLanguageCropped();
-            if(destLan.equals(destLanKeep)){
-                mAdapter.getOutputs().get(i).setText(translatedText);
+            final Phrase phrase = responseBody.getTuc().get(reponseIndex).getPhrase();
+            String translatedText = responseBody.getTuc().get(reponseIndex).getPhrase().getText();
+            String destLan = responseBody.getTuc().get(reponseIndex).getPhrase().getLanguage();
+
+            for (int i = 0; i < mAdapter.getOutputs().size(); i++) {
+                String destLanKeep = mAdapter.getOutputs().get(i).getLanguageCropped();
+                if (destLan.equals(destLanKeep)) {
+                    mAdapter.getOutputs().get(i).setText(translatedText);
+                }
             }
+
+            Thread insertionThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    mDataSource.insertTranslation(phrase);
+                    mDataSource.insertWord(responseBody);
+                }
+            });
+            insertionThread.start();
+
+            mAdapter.notifyDataSetChanged();
+            mActivity.mProgressBar.setVisibility(View.GONE);
+        } else {
+            Toast.makeText(mActivity, "no translations available", Toast.LENGTH_SHORT).show();
+            mActivity.mProgressBar.setVisibility(View.GONE);
         }
-
-        mDataSource.insertTranslation(response.body().getTuc().get(0).getPhrase());
-        mDataSource.insertWord(response.body());
-
-        mAdapter.notifyDataSetChanged();
-        mActivity.mProgressBar.setVisibility(View.GONE);
     }
 
     @Override

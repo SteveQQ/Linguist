@@ -47,27 +47,23 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        Thread dbCreateThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                createDB();
+            }
+        }, "dbCreateThread");
+
         setContentView(createActivityView());
         if(savedInstanceState != null) {
             createRecyclerView(savedInstanceState.getParcelableArrayList("PHRASES"));
         } else {
             createRecyclerView(null);
+            dbCreateThread.start();
         }
         creatFAB();
-        Thread dbCreateThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                createDB();
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(MainActivity.this, "db created", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-        dbCreateThread.setName("dbCreateThread");
-        dbCreateThread.start();
+
     }
 
     private void createDB() {
@@ -130,30 +126,31 @@ public class MainActivity extends AppCompatActivity{
         mExecuteFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String from = mInputLanguageSpinner.getSelectedItem().toString();
-                String phrase = mInputWordEditText.getText().toString();
-                if(translationsDataSource.isWord(phrase)){
+                Thread translationThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String from = mInputLanguageSpinner.getSelectedItem().toString();
+                        String phrase = mInputWordEditText.getText().toString();
 
-                    for(int i=0; i < mAdapter.getOutputs().size(); i++){
-                        String translatedText = translationsDataSource.getTranslation(phrase, mAdapter.getOutputs().get(i).getLanguage());
-                        mAdapter.getOutputs().get(i).setText(translatedText);
-                        mAdapter.notifyDataSetChanged();
-//                        String destLanKeep = mAdapter.getOutputs().get(i).getLanguageLong();
-//                        if(destLan.equals(destLanKeep)){
-//                            mAdapter.getOutputs().get(i).setText(translatedText);
-//                            mDataSource.insertTranslation(response.body().getTuc().get(0).getPhrase());
-//                        }
-                    }
-                }else {
-                    for (int i = 0; i < mAdapter.getOutputs().size(); i++) {
-                        String dest = mAdapter.getOutputs().get(i).getLanguage();
-                        GlosbeAPI glosbeAPI = GlosbeClient.getClient().create(GlosbeAPI.class);
+                        for (int i = 0; i < mAdapter.getOutputs().size(); i++) {
+                            String translatedText = translationsDataSource.getTranslation(phrase, mAdapter.getOutputs().get(i).getLanguage());
 
-                        Call<TranslationResponse> call = glosbeAPI.loadTranslation(generateParamsMap(from, dest, phrase));
-                        call.enqueue(new GlosbeCallback(mAdapter, translationsDataSource, MainActivity.this));
-                        mProgressBar.setVisibility(View.VISIBLE);
+                            if (translatedText != null) {
+                                mAdapter.getOutputs().get(i).setText(translatedText);
+                                mHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mAdapter.notifyDataSetChanged();
+                                    }
+                                });
+
+                            } else {
+                                makeApiCall(from, mAdapter.getOutputs().get(i).getLanguage(), phrase);
+                            }
+                        }
                     }
-                }
+                }, "translationThread");
+                translationThread.start();
             }
         });
 
@@ -164,6 +161,19 @@ public class MainActivity extends AppCompatActivity{
                 mRecyclerView.setAdapter(mAdapter);
                 mInputWordEditText.setText("");
                 mInputLanguageSpinner.setSelection(1);
+            }
+        });
+    }
+
+    private void makeApiCall(String from, String dest, String phrase){
+        GlosbeAPI glosbeAPI = GlosbeClient.getClient().create(GlosbeAPI.class);
+
+        Call<TranslationResponse> call = glosbeAPI.loadTranslation(generateParamsMap(from, dest, phrase));
+        call.enqueue(new GlosbeCallback(mAdapter, translationsDataSource, MainActivity.this));
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mProgressBar.setVisibility(View.VISIBLE);
             }
         });
     }
