@@ -31,34 +31,38 @@ public class GlosbeCallback implements Callback<TranslationResponse> {
     @Override
     public void onResponse(Call<TranslationResponse> call, Response<TranslationResponse> response) {
         final TranslationResponse responseBody = response.body();
-        final Phrase phrase = responseBody.getTuc().get(0).getPhrase();
-        String translatedText = responseBody.getTuc().get(0).getPhrase().getText();
-        String destLan = responseBody.getTuc().get(0).getPhrase().getLanguage();
+        if(responseBody.getTuc().size() > 0 && responseBody.getTuc().get(0).getPhrase() != null) {
+            final Phrase phrase = responseBody.getTuc().get(0).getPhrase();
+            String translatedText = responseBody.getTuc().get(0).getPhrase().getText();
+            String destLan = responseBody.getTuc().get(0).getPhrase().getLanguage();
 
-        for (int i = 0; i < mAdapter.getOutputs().size(); i++) {
-            String destLanKeep = mAdapter.getOutputs().get(i).getLanguageCropped();
-            if (destLan.equals(destLanKeep)) {
-                mAdapter.getOutputs().get(i).setText(translatedText);
+            for (int i = 0; i < mAdapter.getOutputs().size(); i++) {
+                String destLanKeep = mAdapter.getOutputs().get(i).getLanguageCropped();
+                if (destLan.equals(destLanKeep)) {
+                    mAdapter.getOutputs().get(i).setText(translatedText);
+                }
             }
+
+            Thread insertionThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    long primaryWordId = mDataSource.insertWord(responseBody);
+                    long translationWordId = mDataSource.insertWord(phrase);
+                    if (primaryWordId < 0) {
+                        primaryWordId = mDataSource.getWordId(responseBody.getPhrase());
+                    }
+                    if (translationWordId < 0) {
+                        translationWordId = mDataSource.getWordId(phrase.getText());
+                    }
+                    mDataSource.insertTranslation(primaryWordId, translationWordId);
+                }
+            });
+            insertionThread.start();
+            mAdapter.notifyDataSetChanged();
+        } else {
+            Toast.makeText(mActivity, "translation not available", Toast.LENGTH_SHORT).show();
         }
 
-        Thread insertionThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                long primaryWordId = mDataSource.insertWord(responseBody);
-                long translationWordId = mDataSource.insertWord(phrase);
-                if(primaryWordId < 0) {
-                    primaryWordId = mDataSource.getWordId(responseBody.getPhrase());
-                }
-                if(translationWordId < 0){
-                    translationWordId = mDataSource.getWordId(phrase.getText());
-                }
-                mDataSource.insertTranslation(primaryWordId, translationWordId);
-            }
-        });
-        insertionThread.start();
-
-        mAdapter.notifyDataSetChanged();
         mActivity.mProgressBar.setVisibility(View.GONE);
     }
 

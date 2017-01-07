@@ -118,32 +118,10 @@ public class TranslationsDataSource {
         return id;
     }
 
-    public boolean isWord(String word){
-        SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
-        db.beginTransaction();
-
-        Cursor cursor = db.rawQuery("SELECT * FROM " +
-                                    mTranslationDatabaseHelper.WORDS_TABLE +
-                                    " WHERE " +
-                                    mTranslationDatabaseHelper.COLUMN_WORDS_WORD +
-                                    " = " +
-                                    "\"" + word + "\"" + ";",
-                                    null);
-        boolean result = cursor.moveToFirst();
-        cursor.close();
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
-        return result;
-    }
-
     public String getTranslation(String word, String lang){
 
         SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
         db.beginTransaction();
-//        sqlite> select t.primary_word, words_table.word from (select words_table.word AS primary_word, translations_table.transl
-//                ation_fk from translations_table inner join words_table on words_table._id = translations_table.word_fk) AS t inner join
-//        words_table on words_table._id = t.translation_fk;
         String result = null;
         Cursor cursor = db.rawQuery("SELECT * " +
                                     "FROM ("+
@@ -182,23 +160,6 @@ public class TranslationsDataSource {
         db.close();
         return result;
     }
-
-//    private int getTranslationId(String text) {
-//        SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
-//        db.beginTransaction();
-//        int transId = -1;
-//        Cursor cursor = db.rawQuery("SELECT * FROM " + mTranslationDatabaseHelper.TRANSLATIONS_TABLE +
-//                " WHERE " + mTranslationDatabaseHelper.COLUMN_TRANSLATIONS_WORD +
-//                "=" + "\"" + text + "\"" + ";", null);
-//        if(cursor.moveToFirst()) {
-//            int index = cursor.getColumnIndex(BaseColumns._ID);
-//            transId = cursor.getInt(index);
-//            cursor.close();
-//        }
-//        db.setTransactionSuccessful();
-//        db.endTransaction();
-//        return transId;
-//    }
 
     private int getLanguageId(String language){
         SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
