@@ -25,7 +25,7 @@ public class TranslationsDataSource {
         fillLanguages();
     }
 
-    public void fillLanguages(){
+    private void fillLanguages(){
         SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
         db.beginTransaction();
 
@@ -44,13 +44,50 @@ public class TranslationsDataSource {
         db.close();
     }
 
-    public void insertTranslation(Phrase phrase){
+    public synchronized long insertWord(TranslationResponse translationResponse){
+        SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
+        db.beginTransaction();
+
+        long id;
+
+        ContentValues wordValues = new ContentValues();
+        wordValues.put(mTranslationDatabaseHelper.COLUMN_WORDS_WORD, translationResponse.getPhrase());
+        wordValues.put(mTranslationDatabaseHelper.COLUMN_WORDS_LANGUAGE_FK, getLanguageId(translationResponse.getFrom()));
+        id = db.insert(mTranslationDatabaseHelper.WORDS_TABLE,
+                null,
+                wordValues);
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+        return id;
+    }
+
+    public synchronized  long insertWord(Phrase phraseObj){
+        SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
+        db.beginTransaction();
+
+        long id;
+        ContentValues wordValues = new ContentValues();
+        wordValues.put(mTranslationDatabaseHelper.COLUMN_WORDS_WORD, phraseObj.getText());
+        wordValues.put(mTranslationDatabaseHelper.COLUMN_WORDS_LANGUAGE_FK, getLanguageId(phraseObj.getLanguageLong()));
+        id = db.insert(mTranslationDatabaseHelper.WORDS_TABLE,
+                null,
+                wordValues);
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+        return id;
+    }
+
+    public synchronized  void insertTranslation(long idPrimaryWord, long idTranslationWord){
         SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
         db.beginTransaction();
 
         ContentValues translationValues = new ContentValues();
-        translationValues.put(mTranslationDatabaseHelper.COLUMN_TRANSLATIONS_WORD, phrase.getText());
-        translationValues.put(mTranslationDatabaseHelper.COLUMN_TRANSLATIONS_LANGUAGE_FK, getLanguageId(phrase.getLanguageLong()));
+        translationValues.put(mTranslationDatabaseHelper.COLUMN_TRANSLATIONS_WORD_FK, idPrimaryWord);
+        translationValues.put(mTranslationDatabaseHelper.COLUMN_TRANSLATIONS_TRANSLATION_FK, idTranslationWord);
         db.insert(mTranslationDatabaseHelper.TRANSLATIONS_TABLE,
                 null,
                 translationValues);
@@ -60,20 +97,25 @@ public class TranslationsDataSource {
         db.close();
     }
 
-    public void insertWord(TranslationResponse translationResponse){
+    public synchronized  long getWordId(String word){
         SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
         db.beginTransaction();
 
-        ContentValues wordValues = new ContentValues();
-        wordValues.put(mTranslationDatabaseHelper.COLUMN_WORDS_WORD, translationResponse.getPhrase());
-        wordValues.put(mTranslationDatabaseHelper.COLUMN_WORDS_TRANSLATIONS_FK, getTranslationId(translationResponse.getTuc().get(0).getPhrase().getText()));
-        db.insert(mTranslationDatabaseHelper.WORDS_TABLE,
-                null,
-                wordValues);
+        long id = -1;
+
+        Cursor cursor = db.rawQuery("select * from " + mTranslationDatabaseHelper.WORDS_TABLE +
+                                    " where " + mTranslationDatabaseHelper.COLUMN_WORDS_WORD +
+                                    " = " +
+                                    "\"" + word + "\" ;", null);
+        if(cursor.moveToFirst()){
+            id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
+        }
+
 
         db.setTransactionSuccessful();
         db.endTransaction();
         db.close();
+        return id;
     }
 
     public boolean isWord(String word){
@@ -96,25 +138,41 @@ public class TranslationsDataSource {
     }
 
     public String getTranslation(String word, String lang){
+
         SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
         db.beginTransaction();
-
+//        sqlite> select t.primary_word, words_table.word from (select words_table.word AS primary_word, translations_table.transl
+//                ation_fk from translations_table inner join words_table on words_table._id = translations_table.word_fk) AS t inner join
+//        words_table on words_table._id = t.translation_fk;
         String result = null;
-        Cursor cursor = db.rawQuery("SELECT * FROM (" +
-                                    "SELECT words_table.word AS primary_word, translations_table.word AS translated_word, languages_table.language AS destined_lang FROM " +
-                                    mTranslationDatabaseHelper.WORDS_TABLE +
-                                    " INNER JOIN " + mTranslationDatabaseHelper.TRANSLATIONS_TABLE +
-                                    " ON words_table.translations_fk = translations_table._id" +
-                                    " INNER JOIN " + mTranslationDatabaseHelper.LANGUAGES_TABLE +
-                                    " ON translations_table.languages_fk = languages_table._id) AS t WHERE t.primary_word = "+
-                                    "\"" + word + "\"" + ";",
+        Cursor cursor = db.rawQuery("SELECT * " +
+                                    "FROM ("+
+                                        "SELECT t2.prim_word AS word, t2.tran_word AS translation, languages_table.language AS language " +
+                                        "FROM ( " +
+                                            "SELECT t.primary_word AS prim_word, words_table.word AS tran_word, words_table.language_fk AS lan_fk " +
+                                            "FROM (" +
+                                                        "(" +
+                                                        "SELECT words_table.word AS primary_word, translations_table.translation_fk " +
+                                                         "FROM translations_table " +
+                                                        "INNER JOIN words_table " +
+                                                        "ON words_table._id = translations_table.word_fk " +
+                                                        ") AS t " +
+                                                    "INNER JOIN words_table " +
+                                                    "ON words_table._id = t.translation_fk" +
+                                                    ") AS t2 " +
+                                            "INNER JOIN languages_table " +
+                                            "ON t2.language_fk = languages_table._id " +
+                                        ") AS t2 " +
+                                        "INNER JOIN languages_table " +
+                                        "ON t2.lan_fk = languages_table._id " +
+                                    ") AS t3 " +
+                                    "WHERE t3.word = " + "\"" + word + "\";",
                                     null);
 
         if(cursor.moveToFirst()){
             do{
-                int index = cursor.getColumnIndex("destined_lang");
-                if(cursor.getString(index).equals(lang)){
-                    result = cursor.getString(cursor.getColumnIndex("translated_word"));
+                if(cursor.getString(cursor.getColumnIndex("language")).equals(lang)){
+                    result = cursor.getString(cursor.getColumnIndex("translation"));
                 }
             } while (cursor.moveToNext());
         }
@@ -125,22 +183,22 @@ public class TranslationsDataSource {
         return result;
     }
 
-    private int getTranslationId(String text) {
-        SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
-        db.beginTransaction();
-        int transId = -1;
-        Cursor cursor = db.rawQuery("SELECT * FROM " + mTranslationDatabaseHelper.TRANSLATIONS_TABLE +
-                " WHERE " + mTranslationDatabaseHelper.COLUMN_TRANSLATIONS_WORD +
-                "=" + "\"" + text + "\"" + ";", null);
-        if(cursor.moveToFirst()) {
-            int index = cursor.getColumnIndex(BaseColumns._ID);
-            transId = cursor.getInt(index);
-            cursor.close();
-        }
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        return transId;
-    }
+//    private int getTranslationId(String text) {
+//        SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
+//        db.beginTransaction();
+//        int transId = -1;
+//        Cursor cursor = db.rawQuery("SELECT * FROM " + mTranslationDatabaseHelper.TRANSLATIONS_TABLE +
+//                " WHERE " + mTranslationDatabaseHelper.COLUMN_TRANSLATIONS_WORD +
+//                "=" + "\"" + text + "\"" + ";", null);
+//        if(cursor.moveToFirst()) {
+//            int index = cursor.getColumnIndex(BaseColumns._ID);
+//            transId = cursor.getInt(index);
+//            cursor.close();
+//        }
+//        db.setTransactionSuccessful();
+//        db.endTransaction();
+//        return transId;
+//    }
 
     private int getLanguageId(String language){
         SQLiteDatabase db = mTranslationDatabaseHelper.getWritableDatabase();
